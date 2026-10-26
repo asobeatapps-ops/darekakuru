@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#101823">
+<meta name="description" content="深夜23:59。ドアの外にいるのは誰？全15種の結末がつながる、短編ミステリー×カオスゲーム。ASOBEAT">
+<title>23:59、誰かが来る。 | ASOBEAT</title>
+<style>
+:root{color-scheme:dark;--bg:#0c121b;--panel:#192331;--panel2:#202c3b;--line:#354254;--ink:#eae9df;--muted:#aab4c2;--amber:#eab87b;--cyan:#92cad2;--red:#df7a7d;--shadow:#080d14}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}button:disabled{cursor:default;opacity:.5}
+button:focus-visible,.hotspot:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+#app{position:relative;width:100%;max-width:490px;min-height:100dvh;margin:auto;overflow:hidden;background:linear-gradient(180deg,#151d29 0%,#0b121c 100%);box-shadow:0 0 70px #0009}
+.screen{display:none;min-height:100dvh;flex-direction:column;position:relative}.screen.active{display:flex;animation:arrive .22s ease-out}@keyframes arrive{from{opacity:.6}to{opacity:1}}
+.brand{font:700 10px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.22em;color:#9cabb8}
+.mini-label{font:700 10px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:#8fa2b3}
+.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-variant-numeric:tabular-nums}
+.primary{border:1px solid #edbd83;background:#dba96e;color:#1d2226;font-weight:800;letter-spacing:.07em;min-height:49px;padding:13px 20px;border-radius:5px;box-shadow:inset 0 1px #f8d4a0,0 3px 0 #785b3c;transition:transform .12s,background .12s}
+.primary:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 1px #f8d4a0,0 1px 0 #785b3c}
+.secondary{border:1px solid #526071;background:#253242;color:var(--ink);font-weight:700;min-height:44px;padding:10px 13px;border-radius:5px}
+.subtle{border:1px solid #344454;background:transparent;color:#cad2da;min-height:41px;border-radius:5px;padding:10px 13px;font-size:12px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:21px 21px 10px;gap:10px}
+.textbutton{background:none;border:0;padding:8px;color:#c6d0da;font-size:12px}
+/* title */
+#titleScreen{align-items:center;justify-content:space-between;padding:0 23px calc(25px + env(safe-area-inset-bottom))}
+#titleScreen .brand{margin-top:calc(38px + env(safe-area-inset-top))}
+.title-header{text-align:center;padding:22px 0 8px;z-index:1}
+.title-clock{color:var(--amber);letter-spacing:.16em;font-size:16px;font-family:ui-monospace,monospace;margin-bottom:12px}
+.title-header h1{font-size:clamp(25px,7.0vw,38px);line-height:1.5;letter-spacing:.045em;margin:0;font-weight:800;text-shadow:0 2px 18px #000b}
+.title-header p{font-size:11px;letter-spacing:.2em;color:#8999aa;margin:10px 0}
+.title-room-wrap{width:100%;margin:0 auto;position:relative;border:1px solid #334153;box-shadow:0 18px 55px #0006;overflow:hidden;max-width:420px;aspect-ratio:384/304;background:#101927}
+.title-room-wrap:after{content:'';inset:0;position:absolute;pointer-events:none;box-shadow:inset 0 0 42px #03070a9a}
+.title-room-wrap canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.title-actions{width:100%;max-width:360px;display:grid;gap:15px;text-align:center;margin-top:25px}.title-actions .primary{font-size:17px;min-height:56px}.title-actions .mini-label{font-size:10px}
+/* game */
+#gameScreen{padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+.game-header{padding:calc(18px + env(safe-area-inset-top)) 17px 10px;display:flex;align-items:center;justify-content:space-between}
+.game-clock{font-family:ui-monospace,Consolas,monospace;font-weight:700;color:#e8b77b;font-size:27px;letter-spacing:.1em;line-height:1}
+.clock-caption{font-size:9px;color:#8797a6;margin-top:5px;letter-spacing:.14em}
+.game-topright{display:flex;align-items:center;gap:6px}.icon-btn{width:39px;height:39px;border:1px solid #354255;background:#1b2735;border-radius:5px;display:grid;place-items:center;font-size:16px}
+.timer-strip{height:3px;background:#273441;margin:0 17px 14px;position:relative}.timer-strip>i{height:100%;display:block;background:#c99e71;width:0%;transition:width .05s linear}
+.scene-shell{margin:0 12px;position:relative;border:1px solid #445065;background:#141e2b;aspect-ratio:384/304;box-shadow:0 9px 0 #0a111a,0 17px 32px #0005;overflow:hidden}
+.scene-shell canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
+.hotspot{position:absolute;appearance:none;background:transparent;border:1px solid transparent;border-radius:0;padding:0;touch-action:manipulation}
+.hotspot:active{background:#c5dbe513}.hotspot:focus-visible{border:2px solid var(--cyan)}
+.hotspot:after{position:absolute;inset:0;content:'';border:1px solid transparent;pointer-events:none}
+.hotspot.active:after{border:1px dashed #e6c69a99;background:#d8bd8530}
+.hs-door{left:38%;top:18%;width:34%;height:70%}.hs-intercom{left:14%;top:26%;width:17%;height:35%}.hs-clock{left:75%;top:15%;width:19%;height:23%}.hs-light{left:77%;top:51%;width:18%;height:21%}.hs-phone{left:69%;top:75%;width:23%;height:22%}
+.notice{margin:16px 18px 8px;min-height:46px;display:flex;align-items:center;gap:11px;border-bottom:1px solid #354352;padding:0 2px 9px}
+.notice .signal{width:7px;height:7px;background:#c59d77;box-shadow:0 0 13px #deb38172;flex:none}.notice span{font-size:12px;line-height:1.65;color:#cad1d8;white-space:pre-wrap}
+.panel-area{padding:1px 17px 6px;flex:1;min-height:150px;display:flex;flex-direction:column}
+.panel-head{display:flex;align-items:center;justify-content:space-between;min-height:26px;margin:0 0 9px}.panel-head h2{font-size:13px;margin:0;color:#f3e6d7;font-weight:750;letter-spacing:.06em}.panel-head .close{padding:3px 8px;border:0;color:#9aabb9;background:transparent}
+.action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.act{background:#233242;border:1px solid #435368;min-height:49px;text-align:left;padding:11px 13px;border-radius:4px;font-size:13px;font-weight:700;line-height:1.5;touch-action:manipulation;position:relative;overflow:hidden}
+.act:active{background:#35495f}.act .shortcut{display:block;font-size:9px;color:#a5b5c6;margin-top:2px;font-weight:500}
+.act.warning{border-color:#816e59;color:#f1c695}.act.long{grid-column:span 2;text-align:center;user-select:none;-webkit-user-select:none;touch-action:none;overflow:hidden}
+.act.long:before{content:'';position:absolute;left:0;bottom:0;height:3px;background:#cbe3df;width:var(--hold,0%)}
+.prompt-hint{font-size:12px;color:#90a0af;line-height:1.9;margin:auto 4px;text-align:center}
+.game-bottom{padding:5px 17px 0;min-height:35px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.end-night{background:transparent;border:0;color:#9eafbf;text-decoration:underline;text-underline-offset:3px;font-size:11px;padding:7px 0}.game-footer-note{color:#6d8090;font-size:10px}
+/* cinematic + result */
+#endingScreen,#resultScreen,#galleryScreen{padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+.ending-body{padding:16px 18px 20px;display:flex;flex-direction:column;flex:1;justify-content:center;gap:16px}
+.ending-scene{width:100%;aspect-ratio:384/280;border:1px solid #394859;background:#0f1a28;box-shadow:0 12px 35px #0008;overflow:hidden}
+.ending-scene canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.ending-meta{font:700 11px/1.5 ui-monospace,monospace;letter-spacing:.16em;color:var(--amber)}
+.ending-title{font-size:clamp(22px,6vw,29px);font-weight:800;margin:2px 0 8px;letter-spacing:.05em;line-height:1.5}
+.ending-line{font-size:14px;line-height:2;min-height:68px;color:#d9e0e3;white-space:pre-line}
+.ending-continue{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:12px}.ending-progress{height:3px;background:#2b3b4a;flex:1}.ending-progress i{display:block;height:100%;background:#deb282;width:0%}
+.result-content{padding:30px 21px;flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:20px}
+.result-badge{color:#b8c8d5;font:700 12px/1.5 ui-monospace,monospace;letter-spacing:.16em}.result-content h2{font-size:clamp(23px,6vw,29px);line-height:1.4;margin:4px 0 0}.result-rule{height:1px;background:#46536a;margin:4px 0}.result-desc{font-size:14px;color:#c4cfd9;line-height:1.85;white-space:pre-line}
+.progress-header{display:flex;align-items:baseline;justify-content:space-between}.progress-header strong{color:#e4b77f;font-size:22px;font-family:ui-monospace,monospace}.progress-track{height:5px;background:#324051}.progress-track span{height:100%;background:#dcb581;display:block;transition:width .4s}
+.result-actions{display:grid;gap:9px}.result-actions .primary{font-size:15px}
+/* gallery */
+.gallery-content{padding:10px 17px 24px;flex:1}.gallery-intro{padding:12px 4px 18px}.gallery-intro h2{font-size:24px;letter-spacing:.07em;margin:0 0 8px}.gallery-intro p{font-size:12px;color:#a6b4c1;line-height:1.8;margin:0}
+.gallery-count{display:flex;align-items:baseline;gap:10px;margin-top:16px}.gallery-count strong{font:700 30px ui-monospace,monospace;color:#efc390}.gallery-count span{font-size:11px;color:#aebbc9}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:17px 0 20px}.gallery-card{border:1px solid #465469;border-radius:4px;background:#222e3d;padding:13px 7px;min-height:94px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-width:0}
+.gallery-card.locked{border-color:#283544;background:#17212f;color:#788694}.gallery-icon{font-size:21px;line-height:1}.gallery-icon svg{width:26px;height:26px}.gallery-num{font:700 10px ui-monospace,monospace;letter-spacing:.09em;color:#b9a487}.gallery-name{font-size:10px;line-height:1.35;text-align:center;overflow-wrap:anywhere;font-weight:700}.gallery-card.locked .gallery-name{letter-spacing:.08em;color:#8995a4}
+.gallery-bottom{display:grid;gap:9px}
+/* popup */
+.toast{position:absolute;left:18px;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:40;background:#28394a;border:1px solid #607789;border-radius:5px;padding:13px 15px;font-size:12px;line-height:1.5;color:#eaf2f4;box-shadow:0 8px 25px #0008;pointer-events:none;opacity:0;transform:translateY(8px);transition:opacity .16s,transform .16s}.toast.visible{opacity:1;transform:translateY(0)}
+.flash{position:absolute;inset:0;pointer-events:none;z-index:20;background:white;opacity:0}.flash.run{animation:flash .45s ease-out}@keyframes flash{0%{opacity:.65}100%{opacity:0}}
+@media(max-height:670px){#titleScreen .brand{margin-top:25px}.title-header{padding:7px 0 6px}.title-header h1{font-size:27px}.title-room-wrap{width:min(100%,calc(37dvh * 384 / 304))}.title-actions{margin-top:14px}.game-header{padding-top:11px}.timer-strip{margin-bottom:8px}.scene-shell{width:min(calc(100% - 24px),calc(38dvh * 384 / 304));margin-left:auto;margin-right:auto}.notice{margin-top:10px;min-height:39px}.panel-area{min-height:135px}.act{min-height:43px;padding:7px 11px}}
+@media(max-height:620px){.game-header{padding-top:8px;padding-bottom:7px}.timer-strip{margin-bottom:6px}.scene-shell{width:min(calc(100% - 24px),calc(36dvh * 384 / 304))}.notice{margin-top:7px;margin-bottom:4px;min-height:35px;padding-bottom:5px}.act{min-height:44px;padding:5px 10px;line-height:1.35}.act .shortcut{font-size:8px;margin-top:1px}.panel-head{margin-bottom:6px}.game-bottom{padding-top:1px;min-height:29px}}
+@media(min-height:621px) and (max-height:790px){.scene-shell{width:min(calc(100% - 24px),calc(40dvh * 384 / 304));margin-left:auto;margin-right:auto}.act{min-height:44px;padding:8px 11px;line-height:1.4}.notice{margin-top:10px;min-height:41px}.panel-area{min-height:154px}}
+@media(orientation:landscape) and (max-height:480px) and (min-width:600px){#app{max-width:100%;min-height:100dvh}#titleScreen.active{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:28px auto auto;align-content:center;column-gap:14px;padding:10px 20px}#titleScreen .brand{grid-column:1;grid-row:1;margin-top:0;text-align:center}.title-header{grid-column:1;grid-row:2;padding:5px 0}.title-header h1{font-size:clamp(20px,3vw,30px)}.title-room-wrap{grid-column:2;grid-row:1 / span 3;width:min(100%,calc((100dvh - 25px)*384/304));max-width:none}.title-actions{grid-column:1;grid-row:3;margin:0 auto;gap:8px}.title-actions .primary{min-height:47px;font-size:15px}#gameScreen.active{display:grid;grid-template-columns:56% 44%;grid-template-rows:49px 3px minmax(0,1fr) 32px;column-gap:0;min-height:100dvh;max-height:100dvh;padding-bottom:5px;overflow:hidden}.game-header{grid-row:1;grid-column:1 / -1;padding:7px 15px 5px}.game-clock{font-size:23px}.clock-caption{margin-top:2px}.timer-strip{grid-column:1 / -1;grid-row:2;margin:0 12px}.scene-shell{grid-column:1;grid-row:3;width:min(calc(100% - 24px),calc((100dvh - 92px)*384/304));align-self:center;justify-self:center;margin:auto;max-height:calc(100dvh - 92px)}.notice{grid-column:1;grid-row:4;margin:0 9px;padding:0 2px;min-height:26px;border-bottom:0}.notice span{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.panel-area{grid-column:2;grid-row:3;min-height:0;padding:3px 13px 0 7px;flex:initial}.panel-head{margin-bottom:5px}.panel-head h2{font-size:12px}.act{min-height:43px;padding:6px 10px;font-size:12px}.act .shortcut{font-size:9px}.action-grid{gap:6px}.game-bottom{grid-column:2;grid-row:4;padding:0 14px 0 8px;min-height:25px}}
+@media(max-width:350px){.game-clock{font-size:23px}.action-grid{gap:6px}.act{font-size:12px;min-height:44px}.panel-area{min-height:135px}.title-header h1{font-size:25px}.gallery-card{min-height:84px}.gallery-name{font-size:9px}}
+@media(min-width:700px){body{background:radial-gradient(ellipse at center,#293547 0%,#0b111a 75%)}#app{border-left:1px solid #394556;border-right:1px solid #394556}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<main id="app">
+  <section id="titleScreen" class="screen active" aria-label="タイトル画面">
+    <div class="brand">ASOBEAT / SHORT MYSTERY</div>
+    <div class="title-header"><div class="title-clock mono">23:59</div><h1>23:59、誰かが来る。</h1><p>404号室で、今夜が終わらない。</p></div>
+    <div class="title-room-wrap"><canvas id="titleCanvas" width="384" height="304" aria-hidden="true"></canvas></div>
+    <div class="title-actions"><button class="primary" id="startBtn">スタート</button><div class="mini-label">全15種類のエンディング</div></div>
+  </section>
+  <section id="gameScreen" class="screen" aria-label="ゲーム画面">
+    <header class="game-header"><div><div class="game-clock">23:59</div><div class="clock-caption">ROOM 404 · どうやら夜が進まない</div></div><div class="game-topright"><button id="soundBtn" class="icon-btn" aria-label="サウンド切替" title="音声ON/OFF">♪</button></div></header>
+    <div class="timer-strip" aria-label="残り時間"><i id="timeBar"></i></div>
+    <div class="scene-shell" id="sceneShell">
+      <canvas id="gameCanvas" width="384" height="304" role="img" aria-label="深夜の404号室。玄関、インターホン、時計、照明、スマートフォンがあります"></canvas>
+      <button class="hotspot hs-door" data-object="door" aria-label="玄関を調べる"></button>
+      <button class="hotspot hs-intercom" data-object="intercom" aria-label="インターホンを調べる"></button>
+      <button class="hotspot hs-clock" data-object="clock" aria-label="時計を調べる"></button>
+      <button class="hotspot hs-light" data-object="light" aria-label="照明を調べる"></button>
+      <button class="hotspot hs-phone" data-object="phone" aria-label="スマートフォンを調べる"></button>
+    </div>
+    <div class="notice"><i class="signal"></i><span id="noticeText" aria-live="polite">ピンポーン。誰かが来た。スマホが震えている。</span></div>
+    <div class="panel-area"><div class="panel-head"><h2 id="panelTitle">部屋を調べる</h2><button class="close" id="closePanel" aria-label="選択を閉じる" hidden>閉じる ×</button></div><div id="actionGrid" class="action-grid"></div><div id="idleHint" class="prompt-hint">気になるものをタップしてください。<br>行動によって結末が変わります。</div></div>
+    <div class="game-bottom"><div class="game-footer-note mono" id="loopNumber">ROOM 404</div><button id="endNight" class="end-night" hidden>今夜を終える</button></div>
+  </section>
+  <section id="endingScreen" class="screen" aria-label="エンディング演出">
+    <div class="topbar"><div class="brand">23:59 / ENDING</div><button class="textbutton" id="skipEnding" hidden>スキップ →</button></div>
+    <div class="ending-body"><div class="ending-scene"><canvas id="endingCanvas" width="384" height="280" aria-hidden="true"></canvas></div><div><div id="endingMeta" class="ending-meta"></div><h2 id="endingTitle" class="ending-title"></h2><div id="endingLine" class="ending-line" aria-live="polite"></div></div><div class="ending-continue"><div class="ending-progress"><i id="endingProgress"></i></div><span class="mini-label" id="endingStepLabel"></span></div></div>
+  </section>
+  <section id="resultScreen" class="screen" aria-label="結果画面">
+    <div class="topbar"><div class="brand">ASOBEAT / 23:59</div><span class="mini-label">END FOUND</span></div>
+    <div class="result-content"><div><div class="result-badge" id="resultBadge"></div><h2 id="resultTitle"></h2></div><div class="result-rule"></div><p class="result-desc" id="resultDesc"></p><div><div class="progress-header"><span class="mini-label">ENDING COLLECTION</span><strong id="resultCount">0 / 15</strong></div><div class="progress-track" style="margin-top:11px"><span id="resultProgress" style="width:0%"></span></div></div><div class="result-actions"><button id="replayBtn" class="primary">もう一度遊ぶ</button><button id="galleryBtn" class="secondary">エンディング図鑑</button><button id="shareResultBtn" class="subtle">Xで結果を共有</button></div></div>
+  </section>
+  <section id="galleryScreen" class="screen" aria-label="エンディング図鑑">
+    <div class="topbar"><div class="brand">ASOBEAT / ARCHIVE</div><button class="textbutton" id="galleryBack">← 戻る</button></div>
+    <div class="gallery-content"><div class="gallery-intro"><h2>エンディング図鑑</h2><p>見つけた結末はここに残ります。<br>まだ見ぬ夜が、どこかにある。</p><div class="gallery-count"><strong id="galleryCount">0 / 15</strong><span>発見済み</span></div></div><div class="progress-track"><span id="galleryProgress" style="width:0%"></span></div><div id="galleryGrid" class="gallery-grid"></div><div class="gallery-bottom"><button id="shareGalleryBtn" class="primary">図鑑を画像で共有</button><button id="galleryReplay" class="secondary">もう一度遊ぶ</button></div></div>
+  </section>
+  <div class="flash" id="flash"></div><div class="toast" id="toast" role="status" aria-live="polite"></div>
+</main>
+<script>
+'use strict';
+// ----- Graphics: a deliberately limited, hand-coded pixel art palette -----
+const PAL={void:'#0b111a',ink:'#111a26',deep:'#152233',wall:'#243348',wallHi:'#304257',wallEdge:'#3f5062',floor:'#252d39',floorLight:'#3a4147',wood:'#5a4a42',woodHi:'#80624c',door:'#4a3940',doorHi:'#6b4c48',doorEdge:'#1a2531',brass:'#d9ae75',light:'#eac58e',ivory:'#f2e7d6',cyan:'#82bbc7',aqua:'#b2d5ce',red:'#cc757c',blue:'#64798e',grey:'#aeb1a9',white:'#e3e4da'};
+const $=(id)=>document.getElementById(id);
+const ctxTitle=$('titleCanvas').getContext('2d');
+const ctxGame=$('gameCanvas').getContext('2d');
+const ctxEnd=$('endingCanvas').getContext('2d');
+for(const ctx of [ctxTitle,ctxGame,ctxEnd])ctx.imageSmoothingEnabled=false;
+function box(c,x,y,w,h,col){c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
+function poly(c,pts,col){c.fillStyle=col;c.beginPath();c.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)c.lineTo(pts[i][0],pts[i][1]);c.closePath();c.fill()}
+function text(c,t,x,y,size=10,color=PAL.ivory,align='left'){c.save();c.font=`bold ${size}px ui-monospace, Consolas, monospace`;c.textBaseline='top';c.textAlign=align;c.fillStyle=color;c.fillText(t,x,y);c.restore()}
+function dot(c,x,y,col=PAL.ivory,r=2){box(c,x,y,r,r,col)}
+function pixelLine(c,x1,y1,x2,y2,col=PAL.white,w=2){c.save();c.strokeStyle=col;c.lineWidth=w;c.beginPath();c.moveTo(Math.round(x1),Math.round(y1));c.lineTo(Math.round(x2),Math.round(y2));c.stroke();c.restore()}
+function drawDoor(c,opt={}){
+ const {light=true,open=false,glow=false,clone=false}=opt;
+ box(c,141,43,142,221,PAL.ink);box(c,148,49,129,210,PAL.doorEdge);box(c,152,53,121,202,PAL.door);
+ if(open){box(c,151,53,122,200,'#071019');box(c,148,53,6,202,'#566078');box(c,154,56,3,194,'#4b5f6a');if(clone)drawMan(c,203,140,2.2,'#596a77');}
+ else{
+   box(c,159,61,105,189,PAL.doorHi);box(c,164,66,96,180,PAL.door);box(c,168,71,85,76,'#503f43');box(c,169,151,84,89,'#524144');box(c,178,76,4,65,'#694b48');box(c,178,159,4,76,'#694b48');
+   box(c,242,171,17,5,light?PAL.brass:'#987a63');box(c,245,171,4,15,'#b89470');box(c,249,184,4,10,'#6f5e56');box(c,242,128,4,4,'#a4a9a9');box(c,243,129,2,2,'#16222e');
+ }
+ box(c,196,65,23,16,'#252b32');text(c,'404',199,68,10,'#d2bf9e');
+ box(c,139,264,147,5,'#101b27');box(c,143,260,144,4,'#53545a');
+ if(glow){box(c,151,52,3,201,'#8cb3c0');box(c,151,52,122,2,'#8cb3c0')}
+}
+function drawIntercom(c,opt={}){
+ const {light=true,active=false,shadow=false}=opt;
+ box(c,53,87,66,103,'#101923');box(c,57,91,58,95,'#77838d');box(c,62,95,49,65,'#25333b');box(c,66,99,41,56,active?'#204551':'#1a2930');
+ if(active){box(c,68,102,37,24,'#426873');box(c,75,110,9,8,'#8aa3a1');if(shadow){drawMan(c,82,116,.30,'#101d2c')}else{box(c,90,105,2,19,'#a2c2bf')}}
+ else{box(c,72,107,33,1,'#314552');box(c,75,131,23,1,'#374c57')}
+ box(c,66,164,40,2,'#304455');box(c,68,169,8,6,light?PAL.cyan:'#456272');box(c,84,169,8,6,'#444c55');box(c,100,169,7,6,PAL.brass);box(c,68,179,35,2,'#4c5760');
+ if(active){box(c,112,96,4,4,'#b6ebed')}
+}
+function drawClock(c,opt={}){
+ const {glitch=false,midnight=false,light=true}=opt;
+ box(c,290,42,76,68,'#131d2c');box(c,294,46,68,60,'#596272');box(c,300,52,56,48,'#132a34');box(c,304,59,48,32,midnight?'#293d40':'#172831');
+ text(c,midnight?'00:00':glitch?'3?:5?':'23:59',328,63,13,midnight?'#e5d2a8':light?'#d9ba84':'#94adbc','center');box(c,303,95,52,2,'#364651');box(c,307,99,8,2,PAL.brass)
+}
+function drawLight(c,on=true,flips=0){
+ box(c,314,158,40,46,'#101a26');box(c,318,162,32,38,'#7a7e7a');box(c,325,167,18,28,'#354254');box(c,327,170,14,22,on?'#e7bc7c':'#536475');box(c,330,176,8,10,on?'#fff0bb':'#728495');
+ if(flips>=2)for(let k=0;k<Math.min(4,flips-1);k++){box(c,344+k*6,119-k*10,9,11,'#a99a80');box(c,346+k*6,121-k*10,5,6,PAL.light)}
+}
+function drawPhone(c,opt={}){
+ const {light=true,active=false,loop=0}=opt;
+ // table
+ poly(c,[[261,224],[364,226],[375,248],[254,246]],'#5c4b45');poly(c,[[262,225],[360,225],[367,234],[259,233]],'#81634c');box(c,263,245,12,42,'#4b4040');box(c,351,246,12,42,'#4b4040');box(c,272,252,81,3,'#a38160');
+ // handset viewed in perspective
+ poly(c,[[288,231],[337,231],[341,249],[291,250]],'#0d1721');poly(c,[[291,233],[334,233],[337,246],[294,247]],active?'#3a7481':'#263e50');box(c,297,235,30,2,active?PAL.cyan:'#7696a3');box(c,298,239,23,2,active?'#b9dce0':'#748b9c');box(c,297,244,16,1,'#537184');
+ if(loop>=5)box(c,324,242,3,3,'#e49a9f');
+}
+function drawRoom(c,st={}){
+ const W=384,H=304;const t=performance.now()/1000;const on=st.light!==false;
+ box(c,0,0,W,H,'#172333');box(c,0,0,W,30,'#0d1623');box(c,0,28,W,6,'#394659');box(c,0,34,W,189,on?'#2a394c':'#1d2d3d');
+ box(c,0,36,12,183,'#182333');box(c,369,36,15,184,'#1a2737');box(c,0,213,W,9,'#131d2a');
+ poly(c,[[0,222],[384,222],[384,304],[0,304]],on?'#37363a':'#242b32');
+ for(let k=0;k<5;k++){pixelLine(c,0,244+k*13,384,244+k*13,on?'#484445':'#30343b',1)}
+ for(let k=-2;k<=6;k++){pixelLine(c,k*105+192,223,192+(k*153),304,on?'#494448':'#32363d',1)}
+ // Wall edge, pixel texture, side cabinet.
+ box(c,24,56,9,156,'#354256');box(c,33,56,2,156,'#3b495b');
+ for(let j=0;j<20;j++){let x=(j*73+39)%380;let y=37+(j*47)%171;if(x>136&&x<287)continue;box(c,x,y,2,1,on?'#36495a':'#293b4c')}
+ box(c,23,191,51,73,'#1b2835');box(c,28,195,43,64,'#4a4b4c');box(c,31,198,37,19,'#5c5351');box(c,31,222,37,22,'#4d4d50');box(c,47,205,8,2,PAL.brass);box(c,47,233,8,2,PAL.brass);
+ // ambient lamp on top-left shelf
+ box(c,42,165,19,28,'#aa8c6a');box(c,37,165,29,4,'#d2ae7d');box(c,49,155,5,10,'#6d594d');
+ drawDoor(c,{light:on,open:!!st.doorOpen,clone:!!st.clone,glow:st.trueStep>=4});
+ drawIntercom(c,{light:on,active:!!st.monitorOn,shadow:!!st.monitorShadow});
+ drawClock(c,{light:on,glitch:!!st.clockGlitch,midnight:!!st.midnight});
+ drawLight(c,on,st.lightFlips||0);drawPhone(c,{light:on,active:!!st.phoneOpen,loop:st.loop||0});
+ if(on){box(c,0,33,384,2,'#4c4c52');box(c,94,37,78,1,'#3c4b5a')}
+ else{box(c,0,0,384,304,'#06111b44');box(c,61,100,48,55,'#183d4944')}
+ if(st.loop>=7&&Math.floor(t*1.1)%8===0){box(c,97,103,9,10,'#8fb1b9');box(c,99,103,4,7,'#1b2934')}
+ if(st.loop>=10&&Math.floor(t*1.2)%12===0){box(c,304,59,48,30,'#313e4b');text(c,'00:00',328,63,13,'#d7aaaa','center')}
+ if(st.selected){let labels={door:[211,123],intercom:[86,83],clock:[326,35],light:[334,153],phone:[317,218]};let [x,y]=labels[st.selected];box(c,x-4,y-4,8,2,PAL.amber);box(c,x-4,y-4,2,8,PAL.amber);box(c,x+3,y-4,2,8,PAL.amber)}
+ if(st.loop>=3&&Math.sin(t*2)>0.92){box(c,141,120,2,7,'#d4c0a1')}
+ // fine vignette bars, avoiding all CSS gradients in scene
+ box(c,0,0,384,9,'#0f1826');box(c,0,298,384,6,'#1d2733')
+}
+function drawMan(c,x,y,scale=1,color='#7a8992'){
+ c.save();c.translate(Math.round(x),Math.round(y));c.scale(scale,scale);
+ box(c,-6,-28,12,11,color);box(c,-4,-30,8,3,'#293543');box(c,-4,-17,8,3,color);box(c,-10,-13,20,16,color);box(c,-12,-12,3,17,color);box(c,9,-12,3,17,color);box(c,-8,3,7,12,'#2c394a');box(c,2,3,7,12,'#2c394a');box(c,-8,15,8,3,'#b8ada2');box(c,2,15,8,3,'#b8ada2');c.restore()
+}
+function drawCat(c,x,y,s=1){c.save();c.translate(x,y);c.scale(s,s);box(c,-10,-7,19,17,'#c3ad91');poly(c,[[-10,-5],[-11,-16],[-4,-11]],'#c3ad91');poly(c,[[9,-5],[11,-16],[4,-11]],'#c3ad91');box(c,-7,-3,3,3,'#2f3039');box(c,3,-3,3,3,'#2f3039');box(c,-1,3,3,2,'#5a4841');box(c,-6,10,13,12,'#a59488');box(c,-8,10,4,10,'#b6a18b');box(c,6,10,4,10,'#b6a18b');box(c,-4,12,8,3,'#364b52');box(c,-1,12,2,3,'#d39b74');c.restore()}
+function drawEndScene(c,end,phase=0,elapsed=0){
+ const id=end.id;const t=performance.now()/1000;box(c,0,0,384,280,'#13202f');
+ if(id===8){
+  for(let i=8;i>=0;i--){let u=(8-i)/8;let w=10+u*124,h=12+u*180,x=192-w/2,y=143-h/2;box(c,x-2,y-2,w+4,h+4,'#526074');box(c,x,y,w,h,'#1d2a3b');box(c,x+5,y+8,w-10,h-16,'#111b28');text(c,'404',192,y+7,Math.max(4,Math.round(6+u*5)),'#b4a087','center')}
+  text(c,'404 ... 404 ... 404',192,256,12,'#9bb3c1','center');return;
+ }
+ if(id===10){
+  box(c,60,26,264,225,'#1a2b3b');box(c,86,38,210,204,'#39495c');box(c,96,49,192,185,'#1c323b');text(c,phase>0?'ERROR':'23:59',192,99,46,phase>0?'#dc7e87':'#e2c195','center');text(c,'TIME REWIND SYSTEM',192,166,12,'#94aeb7','center');for(let i=0;i<8;i++)box(c,(i*53+Math.floor(t*8))%384,54+(i*33)%168,18,2,'#5d8392');return;
+ }
+ if(id===7||id===6||id===12||id===13){
+  box(c,0,0,384,280,'#172435');poly(c,[[25,216],[365,216],[384,280],[0,280]],'#29303a');
+  box(c,94,14,195,247,'#0a1018');box(c,103,23,177,228,'#46515f');box(c,108,28,168,218,'#142733');
+  if(id===7){text(c,'MESSAGE',192,47,13,PAL.cyan,'center');box(c,121,81,130,42,'#2f4c55');text(c,'誰？',142,91,19,PAL.ivory);text(c,'既読 00:00',192,164,17,PAL.light,'center')}
+  if(id===6){text(c,'UNKNOWN CALL',192,57,15,'#bcd9da','center');text(c,'YOUR NUMBER',192,90,12,'#edbf92','center');text(c,'02 MISSED CALLS',192,171,13,PAL.red,'center')}
+  if(id===12){text(c,'DELIVERY',192,49,15,PAL.light,'center');box(c,139,104,107,86,'#987956');box(c,147,109,91,71,'#bb9368');box(c,176,110,35,15,'#e2c59c');text(c,'TOMORROW',192,201,12,PAL.cyan,'center')}
+  if(id===13){text(c,'MANAGEMENT',192,58,13,PAL.cyan,'center');drawMan(c,192,135,2.2,'#a9b0a7');box(c,146,197,92,18,'#d4b17f');text(c,'404 TEST',192,200,11,'#263240','center')}
+  return;
+ }
+ // All other endings begin in the same room; the transformation is the plot.
+ drawRoom(c,{light:id!==9,monitorOn:id===9,monitorShadow:id===9,doorOpen:[1,2,4,5,15].includes(id),clone:[1,2,5,15].includes(id),lightFlips:id===11?4:0,midnight:id===15});
+ // crop floor 24 px via overdraw? room internally 304, ending canvas 280 simply cuts lower 24.
+ if(id===1||id===2||id===5||id===15){drawMan(c,211,167,id===15?2.6:2.2,'#a4a9a8');if(id===2){box(c,202,170,31,12,'#dac39a');text(c,'COPY',217,172,8,'#273347','center')}}
+ if(id===5){for(let i=0;i<5;i++){let radius=16+i*11;pixelLine(c,87-radius/2,121-i*7,87-radius/2,121+i*7,'#8ebac4',1)}box(c,65,109,39,15,'#416273');text(c,'VOICE',84,111,9,'#d5eceb','center')}
+ if(id===15&&phase===6){let cells=[['COPY-01','#4c6b70'],['404 × ∞','#485777'],['TEST COPY','#715c59'],['REWIND','#65566e']];for(let i=0;i<4;i++){let x=24+(i%2)*174,y=31+Math.floor(i/2)*102;box(c,x,y,161,92,'#101a27');box(c,x+5,y+5,151,82,cells[i][1]);text(c,cells[i][0],x+80,y+34,15,'#f1e6d6','center')}}
+ if(id===15&&phase===7){box(c,0,0,384,280,'#122231');drawClock(c,{midnight:false});text(c,'23:59  →  00:00',192,130,20,'#e2c49c','center')}
+ if(id===15&&phase>=10){box(c,140,139,112,89,'#182b39');box(c,150,146,91,72,'#5e7879');text(c,'RENT x2',194,177,15,'#fff0cf','center')}
+ if(id===3){for(let i=0;i<25;i++){let x=161+(i%5)*19,y=92+Math.floor(i/5)*28;box(c,x,y,12,17,'#a3947e');box(c,x+3,y+4,6,6,'#d3b989');box(c,x+4,y+12,4,3,'#847964')}}
+ if(id===4){for(let i=0;i<8;i++){let j=(i+Math.floor(t*1.5)%4)%8;drawCat(c,64+(i%4)*65,182+Math.floor(j/4)*35,.9+(i%2)*.15)}box(c,129,28,145,24,'#a88a66');text(c,'TEST COPY',201,34,12,'#2a2d34','center')}
+ if(id===9){box(c,65,96,48,56,'#2b5b66');for(let i=0;i<12;i++){let x=70+(i%4)*11,y=102+Math.floor(i/4)*14;drawMan(c,x+4,y+7,.21,'#a8c8ca')}text(c,'COPY 032',196,25,17,PAL.cyan,'center')}
+ if(id===11){for(let i=0;i<10;i++){let x=12+(i%5)*73,y=35+Math.floor(i/5)*72;box(c,x,y,26,25,'#e4b888');box(c,x+5,y+4,16,17,'#fff0b4')}box(c,65,242,248,20,'#f3ddae');text(c,'ELECTRICITY : ∞',189,245,13,'#2d2b28','center')}
+ if(id===14){for(let i=0;i<13;i++){let x=(i*61+Math.floor(t*40))%370,y=30+(i*23)%216;box(c,x,y,9+i%4*11,2,i%2?'#91bbca':'#c27980')}text(c,'23:59',192,192,29,PAL.red,'center')}
+ if(id===15&&phase>=8){box(c,0,0,384,280,'#4e6571');box(c,0,0,384,80,'#b8a4a0');box(c,0,80,384,120,'#d3ae87');box(c,0,200,384,80,'#4b4d56');drawMan(c,157,185,3,'#4b5d69');drawMan(c,236,185,3,'#4b5d69');text(c,'00:00',192,28,34,'#f7dfae','center')}
+}
+// ----- Story and branching -----
+const ENDINGS=[
+ {id:1,name:'外にいたのは俺。',tag:'WHO IS THERE',blurb:'ドアの向こうには、もう一人の自分がいた。',lines:['ドアが、ゆっくり開く。','そこには、見慣れた顔が立っていた。','「お前、また開けたのか……」','画面の向こうで、誰かがため息をついた。']},
+ {id:2,name:'のぞき穴の向こう',tag:'COPY 01',blurb:'同じ顔、同じ服。そして胸元には「COPY-01」。',lines:['のぞき穴で見た男が、目の前にいる。','男の服装は、自分とまったく同じ。','胸元の小さな札には「COPY-01」。','「……俺って、コピーなのか？」']},
+ {id:3,name:'鍵、増やしすぎ。',tag:'REPLICATION',blurb:'鍵をかけるたびに鍵が増え、玄関が埋まった。',lines:['ガチャリ。また、鍵をかけた。','……鍵が、ひとつ増えた。','もう一回かけると、さらに増えた。','「鍵まで増えるなァ！！」']},
+ {id:4,name:'猫の役員会議',tag:'TEST COPY',blurb:'ネクタイ姿の猫たちが、404号室で会議を始めた。',lines:['ピンポン、ピンポン、ピンポン……！','ガラッ。なぜか猫が大量に入ってきた。','「本日の議題は、人類の管理についてニャ」','首輪には、揃って「TEST COPY」。']},
+ {id:5,name:'受話器から自分の声',tag:'THE FIRST VOICE',blurb:'外から聞こえてきた声は、自分の声だった。',lines:['受話器から、かすれた声がした。','「俺はずっと外にいるんだ。」','ドアを開けると、同じ声の男。','「話す前に……また戻るのか」']},
+ {id:6,name:'着信拒否したのは俺',tag:'MISSED CALL',blurb:'拒否した相手は、どうしても話したがっている。',lines:['二度目の着信を切った。','なのに、今度は部屋の中から着信音。','「お願いだから……今度こそ出てくれ」','聞こえてくるのは、間違いなく自分の声。']},
+ {id:7,name:'未来から既読がつく',tag:'00:00',blurb:'時計が止まったまま、未来の時刻で既読がついた。',lines:['「誰？」三度目の送信。','チャットの下に、小さな文字。','「既読 00:00」','……今はまだ、23:59のはずなのに。']},
+ {id:8,name:'廊下、無限です。',tag:'ROOM 404 × ∞',blurb:'玄関の外には、同じ404号室が果てしなく続いていた。',lines:['照明を落とし、玄関を開ける。','廊下の奥にも、404号室。','その先にも、その先にも「404」。','全ての部屋から、同じ呼出音が鳴った。']},
+ {id:9,name:'モニターの中に俺がいる',tag:'COPY 032',blurb:'モニターに映るのは、大勢の自分だった。',lines:['暗い部屋で、もう一度モニターを見た。','無人の廊下は、消えていた。','映っていたのは、何十人もの自分。','画面の隅には「COPY 032」。']},
+ {id:10,name:'午前0時が逃げた。',tag:'TIME ERROR',blurb:'時計が逆回転し、時間巻き戻し装置の存在が浮かぶ。',lines:['時計に触れた瞬間、針が逆回転。','昨日。先週。そのまた先週。','TIME REWIND SYSTEM — ERROR','「時間って……逃げられるんだ……」']},
+ {id:11,name:'電気代、無限円。',tag:'∞ YEN',blurb:'増殖した照明で部屋が光り、請求書が届いた。',lines:['パチッ。パチッ。パチッ。','照明が、ひとつ、ふたつ、みっつ。','部屋は小さな太陽になった。','大家からの請求書「電気代：∞円」']},
+ {id:12,name:'明日の俺から宅配便',tag:'TOMORROW',blurb:'未来の荷物には、装置を止めるための説明書が入っていた。',lines:['玄関には、差出人が自分の荷物。','伝票の日付は、まだ来ていない明日。','中には壊れた基板と、短い説明書。','「消音で転送装置を停止」']},
+ {id:13,name:'大家さん、説明して。',tag:'404 SUBJECT',blurb:'管理会社へ電話すると、大家が妙なことを口走った。',lines:['プルル……「はい、大家です！」','「おお！実験体404号くん！」','「……実験体って何ですか？」','「あ、今のナシ！忘れて！」プツッ。']},
+ {id:14,name:'また、23:59。',tag:'LOOP',blurb:'日付が変わる直前、再び同じ夜が始まった。',lines:['時計が、ついに0時を指す。','……はずだった。','パッ。部屋が一瞬だけ白くなる。','23:59。また、足音がひとつ増えた。']},
+ {id:15,name:'やっと、明日になった。',tag:'TRUE END',blurb:'二人の自分が出会い、404号室のすべての謎がつながった。',lines:[
+  '消音ボタンを押し続ける。\nずっと響いていた機械音が……止まった。',
+  '時計の数字が、初めてゆっくりと動き出す。',
+  'ドアを開ける。\n外には、疲れ果てた自分が立っていた。',
+  '「……お前、誰？」\n「最初の、お前だよ」',
+  '「この部屋は、失敗すると時間を戻す」\n「でも、失敗した俺は外に残るんだ」',
+  '「インターホンを鳴らしてたのも……？」\n「全部、俺だ」',
+  '鍵。猫の首輪。無限に続く404号室。\nCOPY-01。そして、未来の既読。',
+  '一つずつ、ばらばらだった答えがつながる。\n静寂。時計の針が、ひとつ進んだ。',
+  '00:00。\n初めて、明日になった。',
+  '二人で部屋を出る。\n……と、大家から電話がかかってきた。',
+  '「入居者が2人になったので、家賃も2倍ね！」',
+  '「ふざけんなぁぁぁ！！！」\n――やっと、明日になった。'
+ ]}
+];
+const END_MAP=Object.fromEntries(ENDINGS.map(e=>[e.id,e]));
+const OBJECTS={
+ door:{label:'玄関',actions:[['openDoor','ドアを開ける','本当に開ける？'],['peephole','のぞき穴を見る','外の様子を確認'],['lock','鍵を操作する','ガチャリ……']]},
+ intercom:{label:'インターホン',actions:[['monitor','モニターを確認','外の映像を見る'],['answer','応答する','相手の声を聞く'],['delivery','置き配を指定','玄関の外に置いてもらう'],['test','呼出テスト','室内のテストボタン'],['mute','消音ボタン','押して消音する']]},
+ phone:{label:'スマートフォン',actions:[['message','メッセージを見る','自分の番号から警告'],['reply','「誰？」と返信','メッセージを送信'],['reject','着信を拒否','自分の番号から着信中'],['callSelf','自分の番号へ電話','電話をかける'],['callLandlord','管理会社へ電話','大家さんにつながる']]},
+ clock:{label:'壁掛け時計',actions:[['checkTime','時刻を確認','本当に23:59？'],['tapClock','時計に触れる','ガラスに触れる']]},
+ light:{label:'照明スイッチ',actions:[['lightOff','照明を消す','部屋を暗くする'],['lightOn','照明をつける','明かりを戻す']]}
+};
+const TRUE_SEQUENCE=['lightOff','monitor','callSelf','muteHold','openDoor'];
+const STORAGE_KEY='asobeat_2359_v1';
+let saved={seen:[],plays:0,watchedTrue:false,sound:true};
+try{const obj=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');saved={...saved,...obj,seen:Array.isArray(obj.seen)?obj.seen.filter(n=>Number.isInteger(n)&&n>=1&&n<=15):[]}}catch(e){}
+function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(saved))}catch(e){}}
+let game=null,screen='title',currentEnd=null,cinema=null,returnTo='result';let frameTime=0;let toastTimer=null;let audio=null,ambience=null,lastClockTick=0;
+function selectScreen(name){screen=name;for(const el of document.querySelectorAll('.screen'))el.classList.toggle('active',el.id===name+'Screen')}
+function flash(){const el=$('flash');el.classList.remove('run');void el.offsetWidth;el.classList.add('run')}
+function toast(str){const el=$('toast');el.textContent=str;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),2300)}
+// Web Audio: soft synthesized sounds; no external sound assets or autoplay.
+function initAudio(){if(!saved.sound)return;try{if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume()}catch(e){audio=null}}
+function tone(freq=370,len=.08,type='sine',vol=.036,delay=0){if(!audio||!saved.sound)return;try{const o=audio.createOscillator(),gain=audio.createGain(),now=audio.currentTime+delay;o.type=type;o.frequency.setValueAtTime(freq,now);gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(Math.max(.0001,vol),now+.009);gain.gain.exponentialRampToValueAtTime(.0001,now+len);o.connect(gain);gain.connect(audio.destination);o.start(now);o.stop(now+len+.01)}catch(e){}}
+function stopAmbience(){if(!ambience)return;try{ambience.osc.stop()}catch(e){}try{ambience.osc.disconnect();ambience.gain.disconnect()}catch(e){}ambience=null}
+function startAmbience(){if(!saved.sound||!audio)return;stopAmbience();try{let osc=audio.createOscillator(),gain=audio.createGain();osc.type='sine';osc.frequency.value=89;gain.gain.value=.0012;osc.connect(gain);gain.connect(audio.destination);osc.start();ambience={osc,gain}}catch(e){}}
+function sfx(type){if(!saved.sound)return;initAudio();if(!audio)return;
+ switch(type){case 'bell':tone(660,.12,'sine',.025);tone(830,.24,'sine',.028,.12);break;
+ case 'tap':tone(360,.045,'triangle',.016);break;
+ case 'switch':tone(170,.07,'square',.013);break;
+ case 'lock':tone(215,.06,'triangle',.028);tone(160,.09,'triangle',.02,.05);break;
+ case 'notify':tone(680,.09,'sine',.03);tone(960,.14,'sine',.017,.10);break;
+ case 'call':for(let i=0;i<3;i++){tone(435,.13,'sine',.02,i*.23);tone(480,.13,'sine',.018,i*.23)}break;
+ case 'glitch':for(let i=0;i<6;i++)tone(100+i*70,.055,'sawtooth',.01,i*.05);break;
+ case 'reveal':tone(390,.16,'triangle',.03);tone(580,.19,'triangle',.03,.13);break;
+ case 'true':for(let i=0;i<5;i++)tone([293,370,440,554,740][i],.32,'sine',.032,i*.21);break;}
+}
+function startGame(){saved.plays++;persist();game={running:true,start:performance.now(),light:true,lightFlips:0,monitorOn:false,monitorCount:0,monitorShadow:false,doorOpen:false,phoneOpen:false,peephole:false,locked:0,answered:false,delivery:false,replyCount:0,rejectCount:0,clockCount:0,testTimes:[],trueStep:0,mute:false,lastMessage:'',selected:null,loop:saved.plays,clockGlitch:false};currentEnd=null;cinema=null;selectScreen('game');$('noticeText').textContent=saved.plays>=5?'ピンポーン。……この呼出音、前にも聞いた気がする。':'ピンポーン。誰かが来た。スマホが震えている。';$('endNight').hidden=true;$('timeBar').style.width='0%';selectObject(null);initAudio();startAmbience();lastClockTick=performance.now();sfx('bell')}
+function selectObject(obj){if(!game||!game.running)return;game.selected=obj;document.querySelectorAll('.hotspot').forEach(btn=>btn.classList.toggle('active',btn.dataset.object===obj));const pane=$('actionGrid'),idle=$('idleHint'),close=$('closePanel');pane.innerHTML='';if(!obj){$('panelTitle').textContent='部屋を調べる';close.hidden=true;idle.hidden=false;return}
+ const data=OBJECTS[obj];$('panelTitle').textContent=data.label;close.hidden=false;idle.hidden=true;
+ const actions=data.actions;
+ for(const [key,label,sub] of actions){const b=document.createElement('button');b.className='act'+(key==='mute'?' long':'')+(key==='openDoor'?' warning':'');b.type='button';b.textContent=label;const small=document.createElement('span');small.className='shortcut';small.textContent=key==='mute'?'長押しで別の反応があるかも':sub;b.append(small);
+  if(key==='mute')setupMute(b);else b.addEventListener('click',()=>doAction(key));pane.append(b)}
+}
+function note(text){$('noticeText').textContent=text}
+function stepTruth(action){if(!game)return false;const expected=TRUE_SEQUENCE[game.trueStep];if(action===expected){game.trueStep++;return game.trueStep===TRUE_SEQUENCE.length}
+ // A new attempt may start as soon as the light is turned off; other actions invalidate a partial attempt.
+ game.trueStep=(action==='lightOff'?1:0);return false;
+}
+function doAction(key){if(!game||!game.running)return;initAudio();sfx('tap');const g=game;
+ const reachedTruth=stepTruth(key);
+ switch(key){
+ case 'openDoor':g.doorOpen=true;sfx('lock');if(reachedTruth){finish(15);return}if(g.delivery){finish(12);return}if(g.answered){finish(5);return}if(!g.light){finish(8);return}if(g.peephole){finish(2);return}finish(1);return;
+ case 'peephole':g.peephole=true;note('のぞき穴の向こうに、誰かの肩が見えた。……服が似ている。');sfx('switch');break;
+ case 'lock':g.locked++;sfx('lock');note(g.locked===1?'ガチャリ。鍵をかけた。':g.locked===2?'ガチャリ。……鍵が増えた？':'鍵が、勝手に増殖している。');if(g.locked>=3){finish(3);return}break;
+ case 'monitor':g.monitorCount++;g.monitorOn=true;g.monitorShadow=g.monitorCount>1||saved.plays>=7;note(g.light?'画面には無人の廊下。……映像が少し遅れている。':'暗いモニターに、一瞬だけ人の影が映った。');sfx('switch');if(!g.light&&g.monitorCount>=2){finish(9);return}break;
+ case 'answer':g.answered=true;note('「……おい、聞こえるか？」 インターホンから、自分の声がした。');sfx('call');break;
+ case 'delivery':g.delivery=true;note('「置き配にしてください」……外から、段ボールを置く音。');sfx('switch');break;
+ case 'test':{let now=performance.now();g.testTimes=g.testTimes.filter(t=>now-t<=2000);g.testTimes.push(now);sfx('bell');note(`呼出テスト。ピンポーン！（${g.testTimes.length}回）`);if(g.testTimes.length>=5){finish(4);return}break;}
+ case 'mute':g.mute=!g.mute;note(g.mute?'消音に切り替えた。……低い機械音は止まらない。':'消音を解除した。ピッ。');sfx('switch');break;
+ case 'muteHold':note(game.trueStep===4?'……ブツッ。機械音が完全に止まった。':'一瞬、機械の音が止まった。だが……また鳴り始めた。');sfx('glitch');if(game.trueStep===4){flash()}break;
+ case 'message':g.phoneOpen=true;note(saved.plays>=5?'メッセージ：「ドアを開けるな。今度こそ……」 送信者：自分':'メッセージ：「絶対にドアを開けるな。」 送信者：自分');sfx('notify');break;
+ case 'reply':g.phoneOpen=true;g.replyCount++;note('送信：「誰？」'+(g.replyCount>1?' ……また既読がついた。':' 相手は入力中……'));sfx('notify');if(g.replyCount>=3){finish(7);return}break;
+ case 'reject':g.phoneOpen=true;g.rejectCount++;note(g.rejectCount===1?'着信拒否。相手は、自分の番号……。':'また自分の番号から着信。');sfx('call');if(g.rejectCount>=2){finish(6);return}break;
+ case 'callSelf':g.phoneOpen=true;note('自分の番号に電話をかけた。「……俺だ。今度こそ聞こえるか？」');sfx('call');break;
+ case 'callLandlord':finish(13);return;
+ case 'checkTime':note('23:59。秒針が、いつまで経っても次へ進まない。');sfx('switch');break;
+ case 'tapClock':g.clockCount++;g.clockGlitch=true;note('針が、ほんの少し逆方向へ動いた。');sfx('glitch');if(g.clockCount>=3){finish(10);return}break;
+ case 'lightOff':if(g.light){g.light=false;g.lightFlips++;note('パチッ。薄暗い部屋に、モニターの光だけが残る。');sfx('switch')}else{note('照明は既に消えている。')}if(g.lightFlips>=5){finish(11);return}break;
+ case 'lightOn':if(!g.light){g.light=true;g.lightFlips++;note('パチッ。いつもの部屋に戻った……はず。');sfx('switch')}else{note('照明は既についている。')}if(g.lightFlips>=5){finish(11);return}break;
+ }
+}
+let holdState=null;
+function setupMute(btn){let pointer=null,start=0,handled=false;
+ function reset(){btn.style.setProperty('--hold','0%');if(pointer!==null){try{btn.releasePointerCapture(pointer)}catch(e){}}pointer=null;clearInterval(holdState?.interval);holdState=null;}
+ btn.addEventListener('pointerdown',e=>{if(!game?.running)return;e.preventDefault();pointer=e.pointerId;start=performance.now();handled=false;try{btn.setPointerCapture(pointer)}catch(err){}let interval=setInterval(()=>{if(pointer===null){clearInterval(interval);return}let p=Math.min(100,(performance.now()-start)/1050*100);btn.style.setProperty('--hold',`${p}%`)},25);holdState={interval};});
+ btn.addEventListener('pointerup',e=>{if(pointer!==e.pointerId)return;e.preventDefault();let held=performance.now()-start;reset();if(held>=950){handled=true;doAction('muteHold')}else{handled=true;doAction('mute')}});
+ btn.addEventListener('pointercancel',reset);btn.addEventListener('lostpointercapture',()=>{if(pointer!==null)reset()});
+ // Keyboard alternative for players who cannot use long-press gestures.
+ btn.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();if(!holdState){start=performance.now();holdState={interval:0}}}});
+ btn.addEventListener('keyup',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();let held=performance.now()-start;doAction(held>=950?'muteHold':'mute');holdState=null}});
+}
+function finish(id,opts={}){if(!END_MAP[id])return;if(!opts.rewatch){if(!game?.running)return;game.running=false;game.selected=null;if(!saved.seen.includes(id)){saved.seen.push(id);saved.seen.sort((a,b)=>a-b);persist()}if(id===15){saved.watchedTrue=true;persist()}}
+ stopAmbience();currentEnd=END_MAP[id];returnTo=opts.rewatch?'gallery':'result';
+ if(id===15)sfx('true');else if(id===14||id===10)sfx('glitch');else sfx('reveal');
+ cinema={id,start:performance.now(),phase:0,replay:!!opts.rewatch,done:false};$('endingMeta').textContent=`${id===15?'TRUE END':`END ${String(id).padStart(2,'0')}`}  /  ${currentEnd.tag}`;$('endingTitle').textContent=currentEnd.name;$('endingLine').textContent=currentEnd.lines[0];$('endingProgress').style.width='0%';$('skipEnding').hidden=(id===15&&!opts.rewatch);selectScreen('ending');if(id===15)flash();
+}
+function result(){if(!currentEnd)return;cinema=null;if(returnTo==='gallery'){showGallery();return}selectScreen('result');const n=saved.seen.length;$('resultBadge').textContent=`${currentEnd.id===15?'TRUE END':`ENDING ${String(currentEnd.id).padStart(2,'0')} / 15`}`;$('resultTitle').textContent=currentEnd.name;$('resultDesc').textContent=currentEnd.blurb;$('resultCount').textContent=`${n} / 15`;$('resultProgress').style.width=(n/15*100)+'%'}
+function showGallery(){selectScreen('gallery');const n=saved.seen.length;$('galleryCount').textContent=`${n} / 15`;$('galleryProgress').style.width=(n/15*100)+'%';const grid=$('galleryGrid');grid.innerHTML='';ENDINGS.forEach((e)=>{const found=saved.seen.includes(e.id);let b=document.createElement('button');b.className='gallery-card'+(found?'':' locked');b.type='button';b.title=found?'再視聴する':'未発見';b.setAttribute('aria-label',found?`END ${e.id} ${e.name} を再視聴`:`END ${e.id} 未発見`);const ico=document.createElement('div');ico.className='gallery-icon';ico.innerHTML=found?iconFor(e.id):'<svg viewBox="0 0 24 24" fill="none" stroke="#708092" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';const num=document.createElement('div');num.className='gallery-num';num.textContent=String(e.id).padStart(2,'0');const name=document.createElement('div');name.className='gallery-name';name.textContent=found?e.name:'？？？？？？';b.append(ico,num,name);if(found)b.onclick=()=>finish(e.id,{rewatch:true});grid.append(b)})}
+function iconFor(id){let paths=['M7 5h10v14H7z M11 5v14','M12 3v18 M3 12h18','M7 5h10v14H7z M10 10h4','M5 10l3-5 4 4 4-4 3 5v8H5z','M4 7h16v10H4z M7 10h10','M6 3h12v18H6z M9 7h6','M3 12h18 M12 3v18','M3 3h18v18H3z M8 8h8v8H8z','M4 4h16v16H4z M7 7h3v4','M12 3v9l5 4 M4 12a8 8 0 1 0 8-8','M8 3h8v7H8z M6 14h12v7H6z','M3 5h18v14H3z M12 5v14','M6 4h12v16H6z M8 9h8','M4 12h16 M12 4v16','M3 12h18 M12 3v18 M6 6l12 12'][id-1];return `<svg viewBox="0 0 24 24" fill="none" stroke="${id===15?'#e8c391':'#adbdc7'}" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="${paths}"/></svg>`}
+function tick(now){frameTime=now;const t=now/1000;if(screen==='title')drawRoom(ctxTitle,{light:true,loop:0,monitorOn:(Math.floor(t)%11===3)});
+ if(screen==='game'&&game){if(game.running){if(now-lastClockTick>5200){lastClockTick=now;tone(1020,.022,'sine',.004)}let elapsed=now-game.start;if(elapsed>=45000){finish(14)}else{$('timeBar').style.width=(elapsed/450)+'%';$('endNight').hidden=elapsed<5000}}
+  drawRoom(ctxGame,{...game,loop:game.loop});}
+ if(screen==='ending'&&cinema){const e=END_MAP[cinema.id];const length=e.id===15?2600:1250;let diff=now-cinema.start;let phase=Math.min(e.lines.length-1,Math.floor(diff/length));if(phase!==cinema.phase){cinema.phase=phase;$('endingLine').textContent=e.lines[phase];if(e.id===15&&(phase===8||phase===11))sfx(phase===8?'reveal':'true');else if(phase===e.lines.length-1)sfx('tap')}
+  $('endingStepLabel').textContent=`${Math.min(e.lines.length,Math.floor(diff/length)+1)} / ${e.lines.length}`;$('endingProgress').style.width=(Math.min(1,diff/(length*e.lines.length))*100)+'%';
+  drawEndScene(ctxEnd,e,phase,diff);
+  if(!cinema.replay&&e.id!==15&&diff>700)$('skipEnding').hidden=false;
+  if(e.id===15&&cinema.replay&&diff>900)$('skipEnding').hidden=false;
+  if(diff>=length*e.lines.length+400&&!cinema.done){cinema.done=true;result()}}
+ requestAnimationFrame(tick)}
+// ----- Sharing -----
+function publicUrl(){try{return /^https?:$/.test(location.protocol)?location.href.split('#')[0].split('?')[0]:''}catch(e){return ''}}
+function shareText(){if(!currentEnd)return '';return `『23:59、誰かが来る。』\nEND ${String(currentEnd.id).padStart(2,'0')}「${currentEnd.name}」を発見。\n全15種類中、現在${saved.seen.length}種類発見！\nこのマンション、何かがおかしい……。\n\nあなたは真相にたどり着ける？\n${publicUrl()}\n#ASOBEAT #ゲーム開発 #gamedev`}
+function xShare(text){const url='https://twitter.com/intent/tweet?text='+encodeURIComponent(text);window.open(url,'_blank','noopener,noreferrer');}
+function roundRect(c,x,y,w,h,r,col){c.fillStyle=col;c.beginPath();c.roundRect(x,y,w,h,r);c.fill()}
+function wrapCanvasText(c,str,x,y,width,size,lineHeight,color){c.font=`700 ${size}px -apple-system,"Hiragino Sans",Meiryo,sans-serif`;c.fillStyle=color;let line='';let count=0;for(const ch of str){if(c.measureText(line+ch).width>width&&line){c.fillText(line,x,y+count*lineHeight);count++;line=ch}else line+=ch}if(line){c.fillText(line,x,y+count*lineHeight);count++}return count}
+async function createGalleryImage(){const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1600;const c=canvas.getContext('2d');c.fillStyle='#101925';c.fillRect(0,0,1080,1600);
+ // pixel art header: exact same room as the game, scaled by 2 with crisp nearest-neighbour
+ const art=document.createElement('canvas');art.width=384;art.height=304;const actx=art.getContext('2d');actx.imageSmoothingEnabled=false;drawRoom(actx,{light:false,loop:0});c.imageSmoothingEnabled=false;c.drawImage(art,188,105,704,558);box(c,188,560,704,103,'#101925');
+ c.fillStyle='#9fb0bb';c.font='bold 25px ui-monospace,monospace';c.textAlign='center';c.fillText('ASOBEAT / ENDING ARCHIVE',540,66);
+ c.fillStyle='#f1e7d9';c.font='bold 54px -apple-system,"Hiragino Sans",Meiryo,sans-serif';c.fillText('23:59、誰かが来る。',540,735);
+ c.fillStyle='#c2aa8a';c.font='bold 24px ui-monospace,monospace';c.fillText('THE NIGHT HAS 15 ENDINGS',540,787);
+ c.fillStyle='#ebc08a';c.font='bold 80px ui-monospace,monospace';c.fillText(`${saved.seen.length} / 15`,540,885);
+ const startY=940,w=310,h=101,space=12;
+ for(let i=0;i<15;i++){const e=ENDINGS[i],found=saved.seen.includes(e.id),col=i%3,row=Math.floor(i/3),x=56+col*(w+space),y=startY+row*(h+space);roundRect(c,x,y,w,h,9,found?'#26394a':'#1d2a38');c.strokeStyle=found?'#6e8190':'#364758';c.lineWidth=2;c.strokeRect(x+1,y+1,w-2,h-2);c.textAlign='left';c.font='bold 22px ui-monospace,monospace';c.fillStyle=found?'#e8c08a':'#7d8c9e';c.fillText(String(e.id).padStart(2,'0'),x+16,y+27);wrapCanvasText(c,found?e.name:'？？？？？？',x+16,y+61,w-30,found?20:23,23,found?'#e1e9ec':'#8692a0')}
+ c.textAlign='center';c.fillStyle='#adc0cc';c.font='bold 20px ui-monospace,monospace';c.fillText(publicUrl()||'ASOBEAT / BROWSER GAME',540,1541);
+ return await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('画像の生成に失敗しました')),'image/png'))}
+async function shareGallery(){const btn=$('shareGalleryBtn');btn.disabled=true;btn.textContent='画像を準備しています…';try{const blob=await createGalleryImage(),file=new File([blob],'2359-ending-archive.png',{type:'image/png'});let shared=false;
+ if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'23:59、誰かが来る。',text:`全15種類中${saved.seen.length}種類のエンディングを発見！ #ASOBEAT`});shared=true}catch(e){if(e.name==='AbortError'){return}}}
+ if(!shared){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='2359-ending-archive.png';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);toast('図鑑画像を保存しました。Xに添付して共有できます。')}
+ }catch(e){toast('共有画像を作れませんでした。')}finally{btn.disabled=false;btn.textContent='図鑑を画像で共有'}}
+// ----- Interaction wiring -----
+$('startBtn').addEventListener('click',startGame);
+document.querySelectorAll('.hotspot').forEach(b=>b.addEventListener('click',()=>{if(screen==='game')selectObject(b.dataset.object)}));
+$('closePanel').addEventListener('click',()=>selectObject(null));
+$('soundBtn').addEventListener('click',()=>{saved.sound=!saved.sound;persist();$('soundBtn').textContent=saved.sound?'♪':'×';$('soundBtn').setAttribute('aria-label',saved.sound?'サウンドをオフにする':'サウンドをオンにする');if(saved.sound){initAudio();if(screen==='game')startAmbience();sfx('notify')}else{stopAmbience();if(audio&&audio.state==='running')audio.suspend()}});
+$('endNight').addEventListener('click',()=>finish(14));
+$('skipEnding').addEventListener('click',result);
+$('replayBtn').addEventListener('click',startGame);
+$('galleryBtn').addEventListener('click',showGallery);
+$('shareResultBtn').addEventListener('click',()=>xShare(shareText()));
+$('galleryBack').addEventListener('click',()=>{if(currentEnd){returnTo='result';result()}else selectScreen('title')});
+$('galleryReplay').addEventListener('click',startGame);
+$('shareGalleryBtn').addEventListener('click',shareGallery);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&screen==='game')selectObject(null)});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopAmbience();else if(screen==='game'&&saved.sound){initAudio();startAmbience()}});
+window.addEventListener('pagehide',stopAmbience);
+$('soundBtn').textContent=saved.sound?'♪':'×';
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
